@@ -1,0 +1,4 @@
+.idea/
+__pycache__/
+data/raw/*.txt
+data/raw/singers/*.txt
