@@ -20,7 +20,7 @@ class Model(object):
         dropout -- dropout probability
 
         Attributes:
-        net -- neural network
+        net -- LSTM network
         """
         super(Model, self).__init__()
         self.net = LSTM(tokens, n_hidden_units=256, n_layers=2, dropout=0.5)
@@ -36,7 +36,7 @@ class Model(object):
 
     def train(self, data, n_epochs=50, n_seqs=10, n_steps=50, learning_rate=0.001, clip=5, data_frac=0.9, print_every=100):
         """
-        Trains and saves (every print_every epochs) neural net model
+        Trains and saves (every print_every epochs) LSTM network
 
         Parameters:
         data -- characters to train the network
