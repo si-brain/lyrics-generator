@@ -1,4 +1,4 @@
-from utils import one_hot_encode
+from src.utils import one_hot_encode
 
 import numpy as np
 
@@ -31,18 +31,18 @@ class LSTM(nn.Module):
 
         # Get output, hidden state and cell state from the output of LSTM, apply dropout
         output, (h, c) = self.lstm(x, hc)
-        output = self.dropout(x)
+        output = self.dropout(output)
 
         # Reshape output for fully connected layer
-        output = output.reshape(output.shape[0]*output.shape[1], self.n_hidden)
+        output = output.reshape(output.shape[0]*output.shape[1], self.n_hidden_units)
         output = self.fc(output)
 
         return output, (h, c)
 
     def init_hidden(self, n_seqs: int):
         weight = next(self.parameters()).data
-        return (weight.new(self.n_layers, n_seqs, self.n_hidden).zero_(),
-                weight.new(self.n_layers, n_seqs, self.n_hidden).zero_())
+        return (weight.new(self.n_layers, n_seqs, self.n_hidden_units).zero_(),
+                weight.new(self.n_layers, n_seqs, self.n_hidden_units).zero_())
 
     def predict(self, char, h=None):
         """
@@ -53,7 +53,7 @@ class LSTM(nn.Module):
         h -- hidden state
 
         Returns:
-        encoded_value -- encoded value of predicted character
+        encoded_value -- encoded value of predicted character (integer)
         h -- new hidden state
         """
         if h is None:

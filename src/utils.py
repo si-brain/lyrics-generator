@@ -1,9 +1,9 @@
 import numpy as np
 
 
-def one_hot_encode(arr: list, n_labels: int):
+def one_hot_encode(arr, n_labels: int):
     """
-    Encode (2dim) list into one hot representation
+    Encode multidimensional array into one hot representation
 
     Parameters:
     arr -- 2dim array [n_seqs, n_steps]
@@ -18,7 +18,7 @@ def one_hot_encode(arr: list, n_labels: int):
     return one_hot
 
 
-def get_batches(arr: list, n_seqs: int, n_steps: int):
+def get_batches(arr, n_seqs: int, n_steps: int):
     """
     Create a generator that returns batches of size n_seqs x n_steps from arr.
 
