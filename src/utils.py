@@ -23,9 +23,9 @@ def get_batches(arr, n_seqs: int, n_steps: int):
     Create a generator that returns batches of size n_seqs x n_steps from arr.
 
     Parameters:
-    arr -- Array you want to make batches from
-    n_seqs -- Number of sequences per batch
-    n_steps -- Number of sequence steps per batch
+    arr -- array you want to make batches from
+    n_seqs -- number of sequences per batch
+    n_steps -- number of sequence steps per batch
     """
     batch_size = n_seqs * n_steps
     n_batches = len(arr) // batch_size

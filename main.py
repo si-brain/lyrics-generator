@@ -13,6 +13,8 @@ def get_txt():
 
 
 if __name__ == '__main__':
+
+    # Testing on some random data
     text = get_txt()
     chars = tuple(set(text))
     int_to_char = dict(enumerate(chars))
