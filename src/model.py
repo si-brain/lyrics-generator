@@ -34,7 +34,7 @@ class Model(object):
         """
         self.net.load_state_dict(torch.load(path))
 
-    def train(self, data, n_epochs=50, n_seqs=10, n_steps=50, learning_rate=0.001, clip=5, data_frac=0.9, print_every=100):
+    def train(self, data, n_epochs=50, n_seqs=10, n_steps=50, learning_rate=0.001, clip=5, data_frac=0.9, print_every=100, save_path: str='models/models.pth'):
         """
         Trains and saves (every print_every epochs) LSTM network
 
@@ -47,6 +47,7 @@ class Model(object):
         clip -- clipping rate
         data_frac -- train-dev set fraction
         print_every -- number of epochs before printing stats
+        save_path -- path where to save the model
         """
         self.net.train()
         optimizer = torch.optim.Adam(self.net.parameters(), lr=learning_rate)
@@ -103,7 +104,7 @@ class Model(object):
                           f"Loss: {loss.item()}, "
                           f"Validation Loss: {np.mean(valid_losses)}")
 
-            torch.save(self.net.state_dict(), 'models/model.pth')
+            torch.save(self.net.state_dict(), save_path)
 
     def predict(self, char, h=None):
         """

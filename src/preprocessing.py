@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable
+from typing import Callable, List, Optional
 
 
 class PreprocessingOpBase(ABC):
@@ -32,7 +32,7 @@ class LambdaOp(PreprocessingOpBase):
     Implementation of custom preprocessing operation specified as lambda expression or as a function pointer.
     """
 
-    def __init__(self, func: Callable):
+    def __init__(self, func: Callable[[str], str]):
         """
         Constructor.
         :param func: Callable which will be called on a piece of text.
@@ -81,3 +81,27 @@ class RemoveSubstringOp(PreprocessingOpBase):
         :return: Preprocessed text.
         """
         return text.replace(self._substring, '')
+
+
+class FilterLinesOp(PreprocessingOpBase):
+    """
+    Implementation of the line filtering preprocessing operation.
+    """
+
+    def __init__(self, lines_to_remove: Optional[List[str]] = None):
+        """
+        Constructor.
+        :param lines_to_remove: Beginnings of the lines to remove.
+        """
+        self._lines_to_remove = lines_to_remove or []
+
+    def preprocess(self, text: str) -> str:
+        """
+        Implementation of the base class' virtual method.
+        :param text: The text to be preprocessed.
+        :return: Preprocessed text.
+        """
+        lines = text.split('\n')
+        return ''.join([
+            line for line in lines if not line.isspace() and not any([line.strip().startswith(x) for x in self._lines_to_remove])
+        ])

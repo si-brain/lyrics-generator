@@ -3,7 +3,6 @@ import threading
 import requests
 from typing import Optional, List, Callable, NoReturn
 from bs4 import BeautifulSoup, element
-from preprocessing import LambdaOp, ToLowercaseOp, RemoveSubstringOp
 
 
 class SongDataset(object):
@@ -13,12 +12,14 @@ class SongDataset(object):
 
     def __init__(self, output_file_path: str,
                  output_dir_path: str,
+                 num_singers: int = 10000,
                  thread_count: int = 4,
-                 preprocessing_ops: Optional[List[Callable]] = None):
+                 preprocessing_ops: Optional[List[Callable[[str], str]]] = None):
         """
         Constructor.
         :param output_file_path: Path to the file in which to store all the songs.
         :param output_dir_path: Path to the directory where to store songs grouped by the singer.
+        :param num_singers: Number of singers whose songs to take.
         :param thread_count: Number of threads to use.
         :param preprocessing_ops: Preprocessing operations to apply on each song.
         """
@@ -26,8 +27,9 @@ class SongDataset(object):
         self._output_dir_path = output_dir_path
         self._thread_count = thread_count
         self._lock = threading.Lock()
+        self._terminal_mutex = threading.Lock()
         self._open_file = None
-        self._num_singers = 2   # TODO: Change this back to 10000 to scrape the full data set
+        self._num_singers = num_singers
         self._preprocessing_ops = preprocessing_ops or []
         self._base_url = "https://tekstovi.net/"
         assert self._num_singers % self._thread_count == 0, "Number of singers must be divisible by the number of threads."
@@ -76,19 +78,24 @@ class SongDataset(object):
         soup = BeautifulSoup(page.content, 'html.parser')
         singer_name = soup.find(class_='lyricCapt')
         if singer_name:
+            num_songs = 0
             singer_output_file = os.path.join(self._output_dir_path, f"{singer_name.text.strip()}_{singer_id}.txt")
             with open(singer_output_file, 'w', encoding='utf-8') as singer_file:
                 # for each of the singer's songs
                 for song in soup.find_all(class_='artLyrList'):
                     url = "{}{}".format(self._base_url, song.find('a')['href'])
-                    # write outtput to singer file
-                    # no need to lock the mutex here beacuse singer_file is thread local
+                    # write output to singer file
+                    # no need to lock the mutex here because singer_file is thread local
                     song = self._get_single_song(url)
                     if song:
+                        num_songs += 1
                         singer_file.write(song)
                         # lock the mutex and write song to a file
                         with self._lock:
                             self._open_file.write(song)
+            if num_songs:
+                with self._terminal_mutex:
+                    print(f'== Downloaded {num_songs} songs from {singer_name.text.strip()}. ==')
 
     def _scrape_range(self, start_index: int, end_index: int) -> NoReturn:
         """
@@ -122,21 +129,3 @@ class SongDataset(object):
             thread.join()
         self._open_file.close()
         print(f"Data set prepared. Output file generated: {self._output_file_path}")
-
-
-def to_uppercase(x: str):
-    return x.upper()
-
-
-if __name__ == "__main__":
-    dataset = SongDataset(output_file_path="../data/raw/all_songs.txt",
-                          output_dir_path="../data/raw/singers",
-                          thread_count=1,
-                          preprocessing_ops=[ToLowercaseOp(),
-                                             RemoveSubstringOp("ref."),
-                                             LambdaOp(lambda x: x.upper())])  # ovo nema nikakvog smisla ali sam ostavio da vidis kako moze da se koristi
-    # dataset = SongDataset(output_file_path="../data/raw/all_songs.txt",
-    #                       output_dir_path="../data/raw/singers",
-    #                       thread_count=1,
-    #                       preprocessing_ops=[to_uppercase]) # mozes da prosledis i funkciju ako hoces, ne moras praviti LambdaOp
-    dataset.prepare()
