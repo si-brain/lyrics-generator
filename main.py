@@ -32,7 +32,7 @@ def example_train():
 def example_dataset():
     dataset = SongDataset(output_file_path='data/raw/all_songs.txt',
                           output_dir_path='data/raw/singers',
-                          num_singers=4,
+                          num_singers=8,
                           thread_count=4,
                           preprocessing_ops=[
                               preprocessing.ToLowercaseOp(),
