@@ -45,7 +45,7 @@ def train_on_song_dataset():
 
     model.load_state_dict(torch.load('models/lstm-512-4.pth', map_location=torch.device('cpu')), strict=False)
     model.eval()
-    output = sample(model, 400, starting_word='ljubav', top_k=5)
+    output = sample(model, 400, starting_word='ja sam', top_k=5)
     print(output)
 
 

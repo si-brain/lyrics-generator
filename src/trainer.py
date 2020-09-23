@@ -14,7 +14,6 @@ class TrainerConfig:
     clip = 5
     validation_fraction = 0.1
     print_every = 100
-
     # checkpoint parameters
     save_path = None
 
