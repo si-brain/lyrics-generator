@@ -37,16 +37,16 @@ def train_on_song_dataset():
     char_to_int = {char: integer for integer, char in int_to_char.items()}
     data = np.array([char_to_int[ch] for ch in text])  # encoded data
 
-    model = Model(tokens=chars, dropout=0.5, n_hidden_units=512, n_layers=4)
-    # config = TrainerConfig(n_epochs=10, batch_size=64, seq_length=160, learning_rate=0.001, clip=5,
-    #                        validation_fraction=0.1, print_every=100, save_path='models/model_test.pth')
-    # trainer = Trainer(model, data, config)
-    # trainer.train()
+    model = Model(tokens=chars, dropout=0.6, n_hidden_units=512, n_layers=2) # BiLSTM model
+    config = TrainerConfig(n_epochs=10, batch_size=128, seq_length=160, learning_rate=0.001, clip=5,
+                           validation_fraction=0.05, print_every=10, save_path='bi-lstm-512-2.pth')
+    trainer = Trainer(model, data, config)
+    trainer.train()
 
-    model.load_state_dict(torch.load('models/lstm-512-4.pth', map_location=torch.device('cpu')), strict=False)
-    model.eval()
-    output = sample(model, 400, starting_word='ja sam', top_k=5)
-    print(output)
+    # model.load_state_dict(torch.load('models/lstm-512-4.pth', map_location=torch.device('cpu')), strict=False)
+    # model.eval()
+    # output = sample(model, 400, starting_word='ja sam', top_k=5)
+    # print(output)
 
 
 if __name__ == '__main__':
