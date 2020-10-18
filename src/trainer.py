@@ -60,7 +60,7 @@ class Trainer:
                 inputs, targets = torch.from_numpy(x).to(self.device), torch.from_numpy(y).to(self.device)
                 h = tuple([each.data for each in h])
                 model.zero_grad()
-                output, h = model.forward(inputs, h)
+                output, h = model(inputs, h)
                 loss = loss_fn(output, targets.view(config.batch_size * config.seq_length).long())
                 loss.backward()
                 nn.utils.clip_grad_norm_(model.parameters(), config.clip)
@@ -80,11 +80,11 @@ class Trainer:
                 x = one_hot_encode(x, n_chars)
                 inputs, targets = torch.from_numpy(x).to(self.device), torch.from_numpy(y).to(self.device)
                 h_valid = tuple([each.data for each in h_valid])
-                output, h_valid = model.forward(inputs, h_valid)
+                output, h_valid = model(inputs, h_valid)
                 loss_valid = loss_fn(output, targets.view(config.batch_size * config.seq_length).long())
                 valid_losses.append(loss_valid.item())
 
             print(f"Epoch: {epoch + 1} / {config.n_epochs}, "
                   f"Validation Loss: {np.mean(valid_losses)}")
             self.save_checkpoint(epoch, model.state_dict(), optimizer.state_dict())
-            model.train() # back to train mode after validation
+            model.train()  # back to train mode after validation
